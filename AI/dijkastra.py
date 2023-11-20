@@ -1,43 +1,38 @@
+from collections import deque
 from graph import Graph
-import heapq
 
-def dijkstra_mst(graph, start):
+def dijkstra(graph, start):
     visited = set()
     distances = {vertex: float('inf') for vertex in graph.get_vertices()}
     distances[start] = 0
-    pq = [(0, start)]
+    pq = deque([(0, start)])
 
     while pq:
-        current_dist, current_vertex = heapq.heappop(pq)
+        current_dist, current_vertex = pq.popleft()
 
         if current_vertex in visited:
             continue
 
         visited.add(current_vertex)
 
-        for neighbor, edge_weight in graph.get_edges(current_vertex):
-            new_dist = distances[current_vertex] + edge_weight
+        for neighbor in graph.get_neighbors(current_vertex):
+            new_dist = distances[current_vertex] + 1  # Assuming unweighted graph
 
             if new_dist < distances[neighbor]:
                 distances[neighbor] = new_dist
-                heapq.heappush(pq, (new_dist, neighbor))
+                pq.append((new_dist, neighbor))
 
-    mst_edges = []
-    for vertex in graph.get_vertices():
-        if vertex != start:
-            mst_edges.append((vertex, graph.get_parent(vertex), distances[vertex]))
-
-    return mst_edges
+    return distances
 
 # Example usage:
 g_dijkstra = Graph()
-g_dijkstra.add_edge('A', 'B', 1)
-g_dijkstra.add_edge('A', 'C', 2)
-g_dijkstra.add_edge('B', 'C', 3)
-g_dijkstra.add_edge('B', 'D', 1)
-g_dijkstra.add_edge('C', 'D', 4)
+g_dijkstra.add_edge(1, 2)
+g_dijkstra.add_edge(1, 3)
+g_dijkstra.add_edge(2, 4)
+g_dijkstra.add_edge(2, 5)
+g_dijkstra.add_edge(3, 6)
 
-start_vertex_dijkstra = 'A'
-mst_dijkstra = dijkstra_mst(g_dijkstra, start_vertex_dijkstra)
-print("Dijkstra's Minimal Spanning Tree:")
-print(mst_dijkstra)
+start_vertex_dijkstra = 1
+shortest_paths = dijkstra(g_dijkstra, start_vertex_dijkstra)
+print("Shortest Paths from Vertex", start_vertex_dijkstra)
+print(shortest_paths)
